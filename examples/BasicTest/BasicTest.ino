@@ -1,13 +1,13 @@
-/* WS2812Serial BasicTest Example
+/* SK6182Serial BasicTest Example
 
    Test LEDs by turning then 7 different colors.
 
    This example code is in the public domain. */
 
-#include <WS2812Serial.h>
+#include <SK6182Serial.h>
 
-const int numled = 64;
-const int pin = 1;
+const int numled = 896;
+const int pin = 10;
 
 // Usable pins:
 //   Teensy LC:   1, 4, 5, 24
@@ -15,10 +15,10 @@ const int pin = 1;
 //   Teensy 3.5:  1, 5, 8, 10, 26, 32, 33, 48
 //   Teensy 3.6:  1, 5, 8, 10, 26, 32, 33
 
-byte drawingMemory[numled*3];         //  3 bytes per LED
-DMAMEM byte displayMemory[numled*12]; // 12 bytes per LED
+byte drawingMemory[numled*4];         //  4 bytes per LED
+DMAMEM byte displayMemory[numled*16]; // 16 bytes per LED
 
-WS2812Serial leds(numled, displayMemory, drawingMemory, pin, WS2812_GRB);
+SK6182Serial leds(numled, displayMemory, drawingMemory, pin, SK6182_GRBW);
 
 #define RED    0xFF0000
 #define GREEN  0x00FF00
