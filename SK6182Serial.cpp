@@ -170,12 +170,12 @@ void SK6182Serial::show()
 		uint8_t w = *p++;
 		uint32_t n=0;
 		switch (config) {
-		  case SK6182_RGBW: n = (r << 24) | (g << 16) | (b << 8) w; break;
-		  case SK6182_RBGW: n = (r << 24) | (b << 16) | (g << 8) w; break;
-		  case SK6182_GRBW: n = (g << 24) | (r << 16) | (b << 8) w; break;
-		  case SK6182_GBRW: n = (g << 24) | (b << 16) | (r << 8) w; break;
-		  case SK6182_BRGW: n = (b << 24) | (r << 16) | (g << 8) w; break;
-		  case SK6182_BGRW: n = (b << 24) | (g << 16) | (r << 8) w; break;
+		  case SK6182_RGBW: n = (r << 24) | (g << 16) | (b << 8) | w; break;
+		  case SK6182_RBGW: n = (r << 24) | (b << 16) | (g << 8) | w; break;
+		  case SK6182_GRBW: n = (g << 24) | (r << 16) | (b << 8) | w; break;
+		  case SK6182_GBRW: n = (g << 24) | (b << 16) | (r << 8) | w; break;
+		  case SK6182_BRGW: n = (b << 24) | (r << 16) | (g << 8) | w; break;
+		  case SK6182_BGRW: n = (b << 24) | (g << 16) | (r << 8) | w; break;
 		}
 		const uint8_t *stop = fb + 16;
 		do {
