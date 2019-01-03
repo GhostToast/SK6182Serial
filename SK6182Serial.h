@@ -1,4 +1,5 @@
-/*  WS2812Serial - Non-blocking WS2812 LED Display Library
+/*  SK6182Serial - Non-blocking SK6182 LED Display Library
+    Modification of WS2812Serial for use with RGBW LED strips
     https://github.com/PaulStoffregen/WS2812Serial
     Copyright (c) 2017 Paul Stoffregen, PJRC.COM, LLC
 
@@ -21,22 +22,22 @@
     THE SOFTWARE.
 */
 
-#ifndef WS2812Serial_h_
-#define WS2812Serial_h_
+#ifndef SK6182Serial_h_
+#define SK6182Serial_h_
 
 #include <Arduino.h>
 #include "DMAChannel.h"
 
-#define WS2812_RGB      0       // The WS2811 datasheet documents this way
-#define WS2812_RBG      1
-#define WS2812_GRB      2       // Most LED strips are wired this way
-#define WS2812_GBR      3
-#define WS2812_BRG      4
-#define WS2812_BGR      5
+#define SK6182_RGBW      0       // The WS2811 datasheet documents this way
+#define SK6182_RBGW      1
+#define SK6182_GRBW      2       // Most LED strips are wired this way
+#define SK6182_GBRW      3
+#define SK6182_BRGW      4
+#define SK6182_BGRW      5
 
-class WS2812Serial {
+class SK6182Serial {
 public:
-	constexpr WS2812Serial(uint16_t num, void *fb, void *db, uint8_t pin, uint8_t cfg) :
+	constexpr SK6182Serial(uint16_t num, void *fb, void *db, uint8_t pin, uint8_t cfg) :
 		numled(num), pin(pin), config(cfg),
 		frameBuffer((uint8_t *)fb), drawBuffer((uint8_t *)db) {
 	}
@@ -47,16 +48,18 @@ public:
 		drawBuffer[num+0] = color & 255;
 		drawBuffer[num+1] = (color >> 8) & 255;
 		drawBuffer[num+2] = (color >> 16) & 255;
+		drawBuffer[num+3] = (color >> 24) & 255;
 	}
-	void setPixel(uint32_t num, uint8_t red, uint8_t green, uint8_t blue) {
+	void setPixel(uint32_t num, uint8_t red, uint8_t green, uint8_t blue, uint8_t white=0) {
 		if (num >= numled) return;
 		num *= 3;
 		drawBuffer[num+0] = blue;
 		drawBuffer[num+1] = green;
 		drawBuffer[num+2] = red;
+		drawBuffer[num+3] = white;
 	}
 	void clear() {
-        	memset(drawBuffer, 0, numled * 3);
+        	memset(drawBuffer, 0, numled * 4);
 	} 	
 	void show();
 	bool busy();

@@ -1,4 +1,5 @@
-/*  WS2812Serial - Non-blocking WS2812 LED Display Library
+/*  SK6182Serial - Non-blocking SK6182 LED Display Library
+    Modification of WS2812Serial for use with RGBW LED strips
     https://github.com/PaulStoffregen/WS2812Serial
     Copyright (c) 2017 Paul Stoffregen, PJRC.COM, LLC
 
@@ -21,9 +22,9 @@
     THE SOFTWARE.
 */
 
-#include "WS2812Serial.h"
+#include "SK6182Serial.h"
 
-bool WS2812Serial::begin()
+bool SK6182Serial::begin()
 {
 	uint32_t divisor, portconfig, hwtrigger;
 	KINETISK_UART_t *uart;
@@ -146,7 +147,7 @@ bool WS2812Serial::begin()
 	return true;
 }
 
-void WS2812Serial::show()
+void SK6182Serial::show()
 {
 	// wait if prior DMA still in progress
 #if defined(KINETISK)
@@ -160,20 +161,21 @@ void WS2812Serial::show()
 #endif
 	// copy drawing buffer to frame buffer
 	const uint8_t *p = drawBuffer;
-	const uint8_t *end = p + (numled * 3);
+	const uint8_t *end = p + (numled * 4);
 	uint8_t *fb = frameBuffer;
 	while (p < end) {
 		uint8_t b = *p++;
 		uint8_t g = *p++;
 		uint8_t r = *p++;
+		uint8_t w = *p++;
 		uint32_t n=0;
 		switch (config) {
-		  case WS2812_RGB: n = (r << 16) | (g << 8) | b; break;
-		  case WS2812_RBG: n = (r << 16) | (b << 8) | g; break;
-		  case WS2812_GRB: n = (g << 16) | (r << 8) | b; break;
-		  case WS2812_GBR: n = (g << 16) | (b << 8) | r; break;
-		  case WS2812_BRG: n = (b << 16) | (r << 8) | g; break;
-		  case WS2812_BGR: n = (b << 16) | (g << 8) | r; break;
+		  case SK6182_RGBW: n = (r << 24) | (g << 16) | (b << 8) w; break;
+		  case SK6182_RBGW: n = (r << 24) | (b << 16) | (g << 8) w; break;
+		  case SK6182_GRBW: n = (g << 24) | (r << 16) | (b << 8) w; break;
+		  case SK6182_GBRW: n = (g << 24) | (b << 16) | (r << 8) w; break;
+		  case SK6182_BRGW: n = (b << 24) | (r << 16) | (g << 8) w; break;
+		  case SK6182_BGRW: n = (b << 24) | (g << 16) | (r << 8) w; break;
 		}
 		const uint8_t *stop = fb + 12;
 		do {
@@ -184,7 +186,7 @@ void WS2812Serial::show()
 			*fb++ = x;
 		} while (fb < stop);
 	}
-	// wait 300us WS2812 reset time
+	// wait 300us SK6182 reset time
 	uint32_t min_elapsed = (numled * 30) + 300;
 	if (min_elapsed < 2500) min_elapsed = 2500;
 	uint32_t m;
