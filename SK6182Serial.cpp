@@ -143,7 +143,7 @@ bool SK6182Serial::begin()
 	*(portConfigRegister(pin)) = portconfig;
 	dma->destination(uart->D);
 	dma->triggerAtHardwareEvent(hwtrigger);
-	memset(drawBuffer, 0, numled * 3);
+	memset(drawBuffer, 0, numled * 4);
 	return true;
 }
 
@@ -177,7 +177,7 @@ void SK6182Serial::show()
 		  case SK6182_BRGW: n = (b << 24) | (r << 16) | (g << 8) w; break;
 		  case SK6182_BGRW: n = (b << 24) | (g << 16) | (r << 8) w; break;
 		}
-		const uint8_t *stop = fb + 12;
+		const uint8_t *stop = fb + 16;
 		do {
 			uint8_t x = 0x08;
 			if (!(n & 0x00800000)) x |= 0x07;
@@ -198,15 +198,15 @@ void SK6182Serial::show()
 	prior_micros = m;
 	// start DMA transfer to update LEDs  :-)
 #if defined(KINETISK)
-	dma->sourceBuffer(frameBuffer, numled * 12);
+	dma->sourceBuffer(frameBuffer, numled * 16);
 	dma->transferSize(1);
-	dma->transferCount(numled * 12);
+	dma->transferCount(numled * 16);
 	dma->disableOnCompletion();
 	dma->enable();
 #elif defined(KINETISL)
 	dma->CFG->SAR = frameBuffer;
 	dma->CFG->DSR_BCR = 0x01000000;
-	dma->CFG->DSR_BCR = numled * 12;
+	dma->CFG->DSR_BCR = numled * 16;
 	dma->CFG->DCR = DMA_DCR_ERQ | DMA_DCR_CS | DMA_DCR_SSIZE(1) |
 		DMA_DCR_SINC | DMA_DCR_DSIZE(1) | DMA_DCR_D_REQ;
 #endif
